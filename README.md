@@ -106,12 +106,5 @@ This framework is provided strictly for authorized security assessments, interna
 
 ---
 
-## 📞 SUPPORT & DOCUMENTATION
-- **Email:** support@veilstream.dev
-- **Community:** VeilStream Official Discord
-- **Wiki:** Comprehensive deployment guides, troubleshooting, and advanced configuration documentation available in the repository wiki.
-
----
-
 ## 📜 LICENSE
 Private Use Only. Redistribution, commercial licensing, or unauthorized modification is strictly prohibited. All rights reserved by the VeilStream Core Dev Team.
