@@ -384,8 +384,9 @@ class Dashboard:
         self.main_frame.grid_rowconfigure(0, weight=1)
         self.main_frame.grid_columnconfigure(0, weight=1)
         
-        self.grid_columnconfigure(1, weight=1)
-        self.grid_rowconfigure(0, weight=1)
+        # FIXED: Applied to self.root instead of self
+        self.root.grid_columnconfigure(1, weight=1)
+        self.root.grid_rowconfigure(0, weight=1)
         
         # Tabs
         self.tabs = {"builder": self._build_builder_tab(), "delivery": self._build_delivery_tab(), "monitor": self._build_monitor_tab()}
