@@ -1,5 +1,5 @@
 
-# 🌑 VEILSTREAM TELEMETRY SUITE v6.0.0
+# 🌑 VEILSTREAM TELEMETRY SUITE
 **Fully Automated C2 Framework & Remote Telemetry Platform**
 
 `Python 3.11+` | `Windows / Linux` | `Zero-Terminal GUI` | `Production Ready`
@@ -7,7 +7,7 @@
 ---
 
 ## 📖 OVERVIEW
-VeilStream v6.0.0 is a next-generation, GUI-driven telemetry and payload management framework engineered for operational security, stealth, and complete automation. The entire lifecycle—from payload generation and compilation to deployment and live monitoring—is handled within a single, modern interface. **No terminal commands, manual compilation, or external tools required.**
+VeilStream is a next-generation, GUI-driven telemetry and payload management framework engineered for operational security, stealth, and complete automation. The entire lifecycle—from payload generation and compilation to deployment and live monitoring—is handled within a single, modern interface. **No terminal commands, manual compilation, or external tools required.**
 
 Designed for authorized security assessments, internal infrastructure monitoring, and advanced red-team operations.
 
@@ -23,12 +23,13 @@ Designed for authorized security assessments, internal infrastructure monitoring
 🔹 **Advanced Evasion** - Integrated debugger detection, VM/sandbox timing checks, console suppression, and silent background execution.  
 🔹 **Dual Persistence Layer** - Automatic Registry + Scheduled Task deployment. Survives reboots and standard cleanup routines.  
 🔹 **Passive Telemetry Collection** - Background keylogger (flushes at 40+ keys) and HTTP credential interceptor targeting authentication payloads.  
+🔹 **Compact Purple-Red UI** - Dense, SOC-style layout with zero dead space, live terminal feed, and custom icon support.
 
 ---
 
 ## 🏗️ ARCHITECTURE
 ```
-📦 VEILSTREAM SUITE v6.0.0
+📦 VEILSTREAM SUITE
 ├── 🖥️ unified_suite.py          # All-in-one GUI, C2 Server, Builder & Compiler
 ├── 📊 telemetry_core.db         # SQLite backend with WAL journaling
 └── 🌐 Built-in HTTP Delivery    # Auto-hosts compiled payloads on port 8080
@@ -90,14 +91,11 @@ Designed for authorized security assessments, internal infrastructure monitoring
 
 ---
 
-## 📜 CHANGELOG v6.0.0
-- 🎨 Complete GUI overhaul: Modern dark theme, rounded panels, professional typography, compact layout
-- 🤖 Fully automated pipeline: Zero terminal interaction, built-in PyInstaller compilation
-- 📋 One-click deployment: PowerShell dropper auto-generated & copied to clipboard
-- 🔄 Auto-refresh telemetry: Live host & log tables update every 3 seconds
-- 🔒 Enhanced error handling & thread-safe background compilation
-- 🛡️ Optimized anti-analysis & persistence routines
-- 🗃️ Streamlined SQLite backend with WAL journaling
+## 📜 CHANGELOG v6.1.0
+
+🎨 Complete UI overhaul: Compact purple-red gradient theme, dense SOC-style layout
+🖼️ Custom icon support: Auto-applies veilstream.ico to window & compiled binaries
+📉 Reduced footprint: Tightened padding, smaller fonts, optimized treeview rows, zero dead space
 
 ---
 
