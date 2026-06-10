@@ -1,35 +1,37 @@
 
-# 🌑 VEILSTREAM TELEMETRY SUITE v5.1.0
-**Next-Gen Remote Telemetry & Payload Management Framework**
+# 🌑 VEILSTREAM TELEMETRY SUITE v6.0.0
+**Fully Automated C2 Framework & Remote Telemetry Platform**
 
-`Python 3.11+` | `Windows / Linux` | `Production Ready` | `Private Use`
+`Python 3.11+` | `Windows / Linux` | `Zero-Terminal GUI` | `Production Ready`
 
 ---
 
 ## 📖 OVERVIEW
-VeilStream v5.1.0 is a unified, single-file telemetry and payload management framework engineered for operational security, stealth, and efficiency. Featuring a completely overhauled professional-grade C2 dashboard, AES-CBC encrypted communications, polymorphic payload generation, and zero-disk-artifact execution. Designed for authorized security assessments, internal infrastructure monitoring, and advanced red-team operations.
+VeilStream v6.0.0 is a next-generation, GUI-driven telemetry and payload management framework engineered for operational security, stealth, and complete automation. The entire lifecycle—from payload generation and compilation to deployment and live monitoring—is handled within a single, modern interface. **No terminal commands, manual compilation, or external tools required.**
+
+Designed for authorized security assessments, internal infrastructure monitoring, and advanced red-team operations.
 
 ---
 
 ## 🔥 KEY FEATURES
-🔹 **Modern SOC-Style Dashboard** - Dark-themed, terminal-inspired UI with sidebar navigation, real-time log streaming, and clean data tables. Built for operational clarity, not gimmicks.  
-🔹 **Polymorphic Payload Engine** - Generates uniquely obfuscated payloads per build with randomized control flow, dead-code injection, and dynamic string encryption. Every compilation produces a cryptographically distinct binary.  
-🔹 **Zero-Trace Execution** - All telemetry is buffered in-memory and transmitted via encrypted HTTP POST. No local logs, no temp files, zero forensic footprint on the target system.  
-🔹 **Advanced C2 Communications** - AES-CBC encrypted payloads, per-session keys, and automated heartbeat/beacon routing with randomized jitter.  
-🔹 **Dual Persistence Layer** - Automatic Registry + Scheduled Task deployment with fallback mechanisms. Survives reboots, standard cleanup routines, and user profile resets.  
-🔹 **Anti-Analysis & Evasion** - Integrated debugger detection, VM/sandbox timing checks, console suppression, and runtime environment validation.  
-🔹 **Network Credential Interception** - Passive packet inspection targeting authentication payloads across HTTP streams with intelligent pattern matching and payload truncation.  
-🔹 **Automated Delivery System** - Built-in HTTP dropper generator for silent payload staging and remote execution without manual deployment.  
+🔹 **Zero-Terminal Automated Pipeline** - Configure, compile, stage, and deploy entirely through the GUI. PyInstaller runs silently in the background.  
+🔹 **Polymorphic Payload Engine** - Generates cryptographically distinct binaries per build via randomized control flow, dead-code injection, and dynamic string encryption.  
+🔹 **Built-in Compilation & Staging** - One-click build process automatically compiles the agent and hosts it on an integrated HTTP delivery endpoint.  
+🔹 **One-Click Deployment** - Generates a silent PowerShell one-liner, auto-copies it to your clipboard, and requires zero manual configuration on the target.  
+🔹 **Live Telemetry Dashboard** - Auto-refreshing host table, real-time log streaming, and decrypted payload viewing. Updates every 3 seconds without manual intervention.  
+🔹 **AES-CBC Encrypted C2** - Per-session keys, randomized beacon jitter (45–120s), and memory-only buffer handling. Zero plaintext transmission.  
+🔹 **Advanced Evasion** - Integrated debugger detection, VM/sandbox timing checks, console suppression, and silent background execution.  
+🔹 **Dual Persistence Layer** - Automatic Registry + Scheduled Task deployment. Survives reboots and standard cleanup routines.  
+🔹 **Passive Telemetry Collection** - Background keylogger (flushes at 40+ keys) and HTTP credential interceptor targeting authentication payloads.  
 
 ---
 
 ## 🏗️ ARCHITECTURE
 ```
-📦 VEILSTREAM SUITE v5.1.0
-├── 🖥️ unified_suite.py          # All-in-one C2 Server + Modern GUI + Builder
-├── 📜 payload_template.py       # Core agent logic (auto-injected by builder)
-├── 🌐 c2_delivery_endpoint      # Built-in HTTP payload staging server
-└── 📊 telemetry_core.db         # SQLite backend for host & log management
+📦 VEILSTREAM SUITE v6.0.0
+├── 🖥️ unified_suite.py          # All-in-one GUI, C2 Server, Builder & Compiler
+├── 📊 telemetry_core.db         # SQLite backend with WAL journaling
+└── 🌐 Built-in HTTP Delivery    # Auto-hosts compiled payloads on port 8080
 ```
 
 ---
@@ -38,63 +40,64 @@ VeilStream v5.1.0 is a unified, single-file telemetry and payload management fra
 - Python 3.11 or higher
 - Operating System: Windows 10/11 (Target) | Windows/Linux (Host)
 - Administrator/Root privileges for packet capture and persistence deployment
-- Python Dependencies: `pynput`, `scapy`, `pycryptodome`, `pyinstaller`, `customtkinter`
+- Python Dependencies: `customtkinter`, `pycryptodome`, `pyinstaller`, `pynput`, `scapy`
 
 ---
 
 ## 📦 INSTALLATION & SETUP
 1. Clone or download the repository to your control machine.
-2. Install required Python packages:
+2. Install required packages:
    ```bash
-   pip install pynput scapy pycryptodome pyinstaller customtkinter
+   pip install customtkinter pycryptodome pyinstaller pynput scapy
    ```
-3. Launch the unified dashboard:
+3. Launch the automated dashboard:
    ```bash
    python unified_suite.py
    ```
-4. The GUI auto-initializes the encrypted C2 listener on port `8443` and the delivery endpoint on port `8080`.
+4. The GUI automatically initializes the encrypted C2 listener on port `8443` and the delivery endpoint on port `8080`.
 
 ---
 
-## 📖 USAGE GUIDE
+## 📖 USAGE GUIDE (STEP-BY-STEP)
 
-### 1. Generate Payload
-- Navigate to the **PAYLOAD BUILDER** tab in the sidebar.
-- Enter your C2 IP/Domain, set a disguise name, and specify an output path.
-- Click **GENERATE PAYLOAD**. The builder applies polymorphic string encryption, junk code injection, and control-flow randomization before writing the final script.
+### 1. CONFIGURE & BUILD
+- Open the **OPERATIONS** tab.
+- Enter your host machine's reachable IP in `C2 IP / Host`.
+- Set a `Disguise Name` (e.g., `win_svc_helper`).
+- Click **1. BUILD & COMPILE**.
+- The GUI handles polymorphic obfuscation, writes the script, and runs PyInstaller in a background thread. Wait for `[SUCCESS]` in the log panel.
 
-### 2. Compile to Executable
-- Open a terminal in the output directory.
-- Run the PyInstaller command:
-  ```bash
-  pyinstaller --onefile --noconsole --name <disguise_name> output_payload.py
-  ```
-- The compiled binary will be located in the `dist/` folder.
+### 2. DEPLOY TO TARGET
+- Once compilation finishes, click **2. GENERATE DEPLOY CMD**.
+- A silent PowerShell one-liner is automatically generated and copied to your clipboard.
+- Transfer the command to the target machine and execute it in an elevated CMD or PowerShell window.
+- The target fetches the compiled agent, executes it hidden, and establishes a secure beacon.
 
-### 3. Deploy & Monitor
-- Use the **DELIVERY SYSTEM** tab to generate a lightweight dropper script that fetches the compiled payload from the C2 delivery endpoint and executes it silently.
-- Monitor live telemetry in the **HOST TELEMETRY** tab. Filter by HWID, export logs, or track geolocation data in real-time. All data is stored locally in the SQLite database with WAL journaling for performance.
+### 3. MONITOR TELEMETRY
+- Switch to the **TELEMETRY** tab.
+- The host table auto-refreshes every 3 seconds. Click any connected host to view live logs.
+- View decrypted keystrokes, captured HTTP credentials, and heartbeat status in real-time.
+- No manual refresh or database queries required.
 
 ---
 
 ## 🛡️ OPERATIONAL SECURITY NOTES
-- All network traffic is encrypted using AES-CBC with per-session keys. No plaintext credentials or keystrokes are stored locally on target or host systems.
-- Payloads are designed to run silently in the background with no visible UI, console output, or system tray icons.
-- Packet capture requires administrative/root privileges. Ensure target environment permissions are configured accordingly.
-- The polymorphic engine ensures each generated binary has a unique cryptographic signature, defeating static hash-based detection.
-- In-memory buffers are cleared immediately after successful transmission. Zero disk artifacts are left on the target.
+- **Zero Local Artifacts:** All telemetry is buffered in-memory and cleared immediately after encrypted transmission. No logs, configs, or temp files are created by the agent.
+- **Encrypted Communications:** All C2 traffic uses AES-CBC with per-session keys. Payloads are never transmitted in plaintext.
+- **Stealth Execution:** Console is suppressed instantly. No UI, tray icons, or visible processes. Runs under current user context.
+- **Polymorphic Builds:** Every compilation produces a unique cryptographic signature, defeating static hash-based detection.
+- **Network Requirements:** Outbound TCP to C2 port `8443`. Passive packet inspection requires administrative privileges on the target.
 
 ---
 
-## 📜 CHANGELOG v5.1.0
-- 🎨 Complete GUI overhaul: Modern dark theme, sidebar navigation, terminal-style logging, professional SOC dashboard layout
-- 🔒 AES-CBC encrypted C2 communications with per-session keys
-- 🎭 Advanced polymorphic builder (string encryption, control-flow flattening, junk injection)
-- 🌍 Integrated IP geolocation & host mapping
-- 🛡️ Anti-debug/anti-VM timing checks
-- 📦 Automated HTTP dropper generator
-- 🗃️ Optimized SQLite backend with WAL journaling
-- 🖥️ Replaced legacy Tkinter with CustomTkinter for modern, responsive UI
+## 📜 CHANGELOG v6.0.0
+- 🎨 Complete GUI overhaul: Modern dark theme, rounded panels, professional typography, compact layout
+- 🤖 Fully automated pipeline: Zero terminal interaction, built-in PyInstaller compilation
+- 📋 One-click deployment: PowerShell dropper auto-generated & copied to clipboard
+- 🔄 Auto-refresh telemetry: Live host & log tables update every 3 seconds
+- 🔒 Enhanced error handling & thread-safe background compilation
+- 🛡️ Optimized anti-analysis & persistence routines
+- 🗃️ Streamlined SQLite backend with WAL journaling
 
 ---
 
@@ -103,6 +106,12 @@ This framework is provided strictly for authorized security assessments, interna
 
 ---
 
+## 📞 SUPPORT & DOCUMENTATION
+- **Email:** support@veilstream.dev
+- **Community:** VeilStream Official Discord
+- **Wiki:** Comprehensive deployment guides, troubleshooting, and advanced configuration documentation available in the repository wiki.
+
+---
+
 ## 📜 LICENSE
 Private Use Only. Redistribution, commercial licensing, or unauthorized modification is strictly prohibited. All rights reserved by the VeilStream Core Dev Team.
-```
